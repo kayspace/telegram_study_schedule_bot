@@ -260,8 +260,8 @@ async function offerTimeSlotOptions(
       await bot.sendMessageWithButtons(chatId, message, buttons);
     }
   } else {
-    message += "Enter your time slots in HH:MM format.\n\n";
-    message += "Send Slot 1 time (e.g., 8:15, 9:30)";
+    message += "Enter your time slots in HH:MM - HH:MM format.\n\n";
+    message += "Send Slot 1 time (e.g., 8:15 - 11:00)";
 
     if (messageId) {
       await bot.editMessageText(chatId, messageId, message);
@@ -281,8 +281,8 @@ async function sendTimePrompt(
 ): Promise<void> {
   const slotIndex = getCurrentTimeSlotIndex(chatId);
   const message =
-    `<b>⏰ Enter Slot ${slotIndex + 1} Time</b>\n\n` +
-    "Format: HH:MM (e.g., 8:15, 14:30)\n\n" +
+    `<b>⏰ Enter Slot ${slotIndex + 1} Time Range</b>\n\n` +
+    "Format: HH:MM - HH:MM (e.g., 8:15 - 11:00)\n\n" +
     `Progress: ${slotIndex}/4 slots`;
 
   if (messageId) {
@@ -303,7 +303,7 @@ async function handleTimeInput(
   if (!addCustomTime(chatId, input)) {
     await bot.sendMessage(
       chatId,
-      "❌ Invalid format! Please use HH:MM format (e.g., 8:15, 14:30)",
+      "❌ Invalid format! Please use HH:MM - HH:MM format (e.g., 8:15 - 11:00, 14:30 - 17:00)",
     );
     await sendTimePrompt(chatId, bot);
     return;

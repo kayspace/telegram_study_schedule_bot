@@ -96,7 +96,8 @@ export function usePreviousTimes(userId: number): boolean {
  */
 export function addCustomTime(userId: number, time: string): boolean {
   const trimmed = time.trim();
-  if (!/^\d{1,2}:\d{2}$/.test(trimmed)) {
+  // Validate HH:MM - HH:MM format
+  if (!/^\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}$/.test(trimmed)) {
     return false;
   }
   if (!userSelections[userId]) {
