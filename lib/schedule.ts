@@ -4,20 +4,20 @@
  */
 
 const SUBJECTS = [
-  'Aerodynamics',
-  'Space Dynamics',
-  'Propulsion',
-  'Structures',
-  'Flight Mechanics',
-  'Mathematics',
-  'Aptitude',
+  "Aerodynamics",
+  "Space Dynamics",
+  "Propulsion",
+  "Structures",
+  "Flight Mechanics",
+  "Mathematics",
+  "Aptitude",
 ];
 
 const SLOTS = [
-  { name: 'Slot 1', time: '8:30 AM - 11:00 AM' },
-  { name: 'Slot 2', time: '12:10 PM - 2:00 PM' },
-  { name: 'Slot 3', time: '2:40 PM - 5:40 PM' },
-  { name: 'Slot 4', time: '7:30 PM - 10:00 PM' },
+  { name: "Slot 1", time: "8:30 AM - 11:00 AM" },
+  { name: "Slot 2", time: "12:10 PM - 2:00 PM" },
+  { name: "Slot 3", time: "2:40 PM - 5:40 PM" },
+  { name: "Slot 4", time: "7:30 PM - 10:00 PM" },
 ];
 
 // In-memory storage for user selections (in production, use a database)
@@ -30,10 +30,10 @@ const userSelections: Record<
 > = {};
 
 export interface UserSchedule {
-  'Slot 1': string | null;
-  'Slot 2': string | null;
-  'Slot 3': string | null;
-  'Slot 4': string | null;
+  "Slot 1": string | null;
+  "Slot 2": string | null;
+  "Slot 3": string | null;
+  "Slot 4": string | null;
 }
 
 /**
@@ -55,10 +55,14 @@ export function getSlots() {
  */
 export function getCurrentSlot(userId: number): string | null {
   const data = userSelections[userId];
-  if (!data) return null;
+
+  // If user doesn't exist yet, initialize them and start from Slot 1
+  if (!data) {
+    userSelections[userId] = { timestamp: Date.now() };
+    return "Slot 1";
+  }
 
   // Determine which slot we're on
-  const keys = Object.keys(data).filter((k) => k !== 'timestamp');
   const slotNames = SLOTS.map((s) => s.name);
 
   for (const slot of slotNames) {
@@ -77,10 +81,10 @@ export function getUserSchedule(userId: number): UserSchedule {
   const data = userSelections[userId] || {};
 
   return {
-    'Slot 1': data['Slot 1'] || null,
-    'Slot 2': data['Slot 2'] || null,
-    'Slot 3': data['Slot 3'] || null,
-    'Slot 4': data['Slot 4'] || null,
+    "Slot 1": data["Slot 1"] || null,
+    "Slot 2": data["Slot 2"] || null,
+    "Slot 3": data["Slot 3"] || null,
+    "Slot 4": data["Slot 4"] || null,
   };
 }
 
@@ -102,10 +106,10 @@ export function selectSubject(userId: number, slot: string, subject: string) {
 export function isScheduleComplete(userId: number): boolean {
   const schedule = getUserSchedule(userId);
   return (
-    schedule['Slot 1'] !== null &&
-    schedule['Slot 2'] !== null &&
-    schedule['Slot 3'] !== null &&
-    schedule['Slot 4'] !== null
+    schedule["Slot 1"] !== null &&
+    schedule["Slot 2"] !== null &&
+    schedule["Slot 3"] !== null &&
+    schedule["Slot 4"] !== null
   );
 }
 
@@ -122,17 +126,17 @@ export function resetUserSchedule(userId: number) {
 export function generateTimetableMessage(userId: number): string {
   const schedule = getUserSchedule(userId);
 
-  let message = '<b>📅 Your Study Timetable</b>\n\n';
+  let message = "<b>📅 Your Study Timetable</b>\n\n";
 
   SLOTS.forEach((slot) => {
     const selected = schedule[slot.name as keyof UserSchedule];
-    const subject = selected || '❌ Not Selected';
+    const subject = selected || "❌ Not Selected";
 
     message += `<b>${slot.name}</b> (${slot.time})\n`;
     message += `📚 ${subject}\n\n`;
   });
 
-  message += '<i>Schedule generated successfully!</i>';
+  message += "<i>Schedule generated successfully!</i>";
 
   return message;
 }
