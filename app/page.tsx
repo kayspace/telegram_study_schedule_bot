@@ -11,10 +11,10 @@ export default function Home() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold mb-4 text-gray-800">
+          <h1 className="text-3xl font-bold mb-4 text-gray-800">
             📚 Telegram Study Bot
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base text-gray-600">
             Automated daily study schedule reminders & planning
           </p>
         </div>
@@ -63,7 +63,7 @@ export default function Home() {
 
         {/* Features */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Features</h2>
+          <h2 className="text-xl font-bold mb-6 text-gray-800">Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
@@ -113,7 +113,7 @@ export default function Home() {
 
         {/* Quick Start */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          <h2 className="text-xl font-bold mb-6 text-gray-800">
             Quick Start (5 minutes)
           </h2>
           <div className="bg-white rounded-lg p-8 space-y-4 shadow-sm">
@@ -190,51 +190,134 @@ export default function Home() {
           </div>
         </section>
 
+        {/* GitHub & Usage */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold mb-6 text-gray-800">Get Started</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                <span>🚀</span> Start Using the Bot
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Ready to use the bot right away? Here's how:
+              </p>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                <li>
+                  Find the bot on Telegram: <strong>@your_bot_username</strong>
+                </li>
+                <li>
+                  Send{" "}
+                  <code
+                    className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+                  >
+                    /start
+                  </code>{" "}
+                  to begin
+                </li>
+                <li>Choose your study subjects for each time slot</li>
+                <li>Get your personalized schedule instantly!</li>
+              </ol>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Pro tip:</strong> The bot remembers your previous
+                  choices and offers to reuse them for faster setup.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                <span>📦</span> GitHub Repository
+              </h3>
+              <p className="text-gray-600 mb-4">
+                View the source code, contribute, or deploy your own instance:
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <strong className="text-gray-800">Author:</strong>{" "}
+                  <a
+                    href="https://github.com/kayspace"
+                    className="text-blue-600 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    @kayspace
+                  </a>
+                </div>
+                <div>
+                  <strong className="text-gray-800">Repository:</strong>{" "}
+                  <a
+                    href="https://github.com/kayspace/telegram_study_schedule_bot"
+                    className="text-blue-600 hover:underline break-all"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    github.com/kayspace/telegram_study_schedule_bot
+                  </a>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <a
+                    href="https://github.com/kayspace/telegram_study_schedule_bot"
+                    className="inline-flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition text-sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>⭐</span> View on GitHub
+                  </a>
+                  <a
+                    href="https://github.com/kayspace/telegram_study_schedule_bot/fork"
+                    className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>🍴</span> Fork
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Setup Guides */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
-            Setup Guides
-          </h2>
+          <h2 className="text-xl font-bold mb-6 text-gray-800">Setup Guides</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <a
-              href="/QUICK_START.md"
-              download
-              className="bg-blue-50 hover:bg-blue-100 rounded-lg p-6 text-center transition border border-blue-200"
+            <Link
+              href="/quick-start"
+              className="bg-blue-50 hover:bg-blue-100 rounded-lg p-6 text-center transition border border-blue-200 block"
             >
               <div className="text-3xl mb-2">⚡</div>
               <h3 className="font-bold text-gray-800">Quick Start</h3>
               <p className="text-sm text-gray-600 mt-2">5-minute setup guide</p>
-            </a>
+            </Link>
 
-            <a
-              href="/TELEGRAM_BOT_SETUP.md"
-              download
-              className="bg-green-50 hover:bg-green-100 rounded-lg p-6 text-center transition border border-green-200"
+            <Link
+              href="/full-guide"
+              className="bg-green-50 hover:bg-green-100 rounded-lg p-6 text-center transition border border-green-200 block"
             >
               <div className="text-3xl mb-2">📚</div>
               <h3 className="font-bold text-gray-800">Full Guide</h3>
               <p className="text-sm text-gray-600 mt-2">
                 Complete setup & deployment
               </p>
-            </a>
+            </Link>
 
-            <a
-              href="/CRON_SETUP.md"
-              download
-              className="bg-purple-50 hover:bg-purple-100 rounded-lg p-6 text-center transition border border-purple-200"
+            <Link
+              href="/cron-setup"
+              className="bg-purple-50 hover:bg-purple-100 rounded-lg p-6 text-center transition border border-purple-200 block"
             >
               <div className="text-3xl mb-2">🕐</div>
               <h3 className="font-bold text-gray-800">Cron Setup</h3>
               <p className="text-sm text-gray-600 mt-2">
                 Daily 7 AM reminders config
               </p>
-            </a>
+            </Link>
           </div>
         </section>
 
         {/* Environment Setup */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          <h2 className="text-xl font-bold mb-6 text-gray-800">
             Environment Setup
           </h2>
           <div className="bg-white rounded-lg p-8 shadow-sm">
@@ -268,7 +351,7 @@ CRON_SECRET=your-secret-key-change-this
 
         {/* File Structure */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          <h2 className="text-xl font-bold mb-6 text-gray-800">
             Project Structure
           </h2>
           <div className="bg-white rounded-lg p-6 font-mono text-sm overflow-x-auto shadow-sm">
