@@ -1,15 +1,20 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
+import { Geist_Mono } from "next/font/google";
+
+const geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6">
+    <main className="min-h-screen bg-gray-50 text-gray-900 p-6 font-mono">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-5xl font-bold mb-4">📚 Telegram Study Bot</h1>
-          <p className="text-xl text-slate-300">
+          <h1 className="text-4xl font-bold mb-4 text-gray-800">
+            📚 Telegram Study Bot
+          </h1>
+          <p className="text-lg text-gray-600">
             Automated daily study schedule reminders & planning
           </p>
         </div>
@@ -17,35 +22,37 @@ export default function Home() {
         {/* Status Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Telegram Status */}
-          <div className="bg-slate-700 rounded-lg p-6 border-l-4 border-blue-500">
-            <h2 className="text-2xl font-bold mb-3 flex items-center gap-2">
+          <div className="bg-white rounded-lg p-6 border-l-4 border-blue-200 shadow-sm">
+            <h2 className="text-xl font-bold mb-3 flex items-center gap-2 text-gray-800">
               <span>🤖</span> Bot Status
             </h2>
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Webhook:</strong>{' '}
-                <code className="bg-slate-800 px-2 py-1 rounded">
+                <strong>Webhook:</strong>{" "}
+                <code
+                  className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+                >
                   /api/telegram
                 </code>
               </p>
               <p>
-                <strong>Cron:</strong>{' '}
-                <code className="bg-slate-800 px-2 py-1 rounded">
+                <strong>Cron:</strong>{" "}
+                <code
+                  className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+                >
                   /api/cron/schedule
                 </code>
               </p>
-              <p className="text-slate-400 pt-2">
-                ✅ API endpoints ready
-              </p>
+              <p className="text-gray-500 pt-2">✅ API endpoints ready</p>
             </div>
           </div>
 
           {/* Setup Progress */}
-          <div className="bg-slate-700 rounded-lg p-6 border-l-4 border-green-500">
-            <h2 className="text-2xl font-bold mb-3 flex items-center gap-2">
+          <div className="bg-white rounded-lg p-6 border-l-4 border-green-200 shadow-sm">
+            <h2 className="text-xl font-bold mb-3 flex items-center gap-2 text-gray-800">
               <span>✅</span> Setup Checklist
             </h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-sm text-gray-700">
               <li>☐ Get bot token from BotFather</li>
               <li>☐ Add TELEGRAM_BOT_TOKEN to env</li>
               <li>☐ Set webhook URL in Telegram</li>
@@ -56,45 +63,49 @@ export default function Home() {
 
         {/* Features */}
         <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">Features</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
                 <span>🚀</span> Manual Start
               </h3>
-              <p className="text-slate-300">
-                Send <code className="bg-slate-800 px-2 py-1 rounded">/start</code> anytime
-                to begin planning (perfect for testing)
+              <p className="text-gray-600">
+                Send{" "}
+                <code
+                  className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+                >
+                  /start
+                </code>{" "}
+                anytime to begin planning (perfect for testing)
               </p>
             </div>
 
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
                 <span>⏰</span> Daily 7 AM Reminder
               </h3>
-              <p className="text-slate-300">
-                Automatic prompts every morning to select your
-                study subjects
+              <p className="text-gray-600">
+                Automatic prompts every morning to select your study subjects
               </p>
             </div>
 
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                <span>📋</span> 4 Time Slots
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
+                <span>📋</span> Custom Time Slots
               </h3>
-              <p className="text-slate-300">
-                8:30 AM, 12:10 PM, 2:40 PM, 7:30 PM - select
-                subjects for each
+              <p className="text-gray-600">
+                Set your own study time slots (1-10 slots supported) with custom
+                times
               </p>
             </div>
 
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-800">
                 <span>🎯</span> 7 Subjects
               </h3>
-              <p className="text-slate-300">
-                Choose from: Aerodynamics, Space Dynamics,
-                Propulsion, Structures, Flight Mechanics, Math, Aptitude
+              <p className="text-gray-600">
+                Choose from: Aerodynamics, Space Dynamics, Propulsion,
+                Structures, Flight Mechanics, Math, Aptitude
               </p>
             </div>
           </div>
@@ -102,17 +113,21 @@ export default function Home() {
 
         {/* Quick Start */}
         <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">Quick Start (5 minutes)</h2>
-          <div className="bg-slate-700 rounded-lg p-8 space-y-4">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Quick Start (5 minutes)
+          </h2>
+          <div className="bg-white rounded-lg p-8 space-y-4 shadow-sm">
             <div className="flex gap-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full font-bold flex-shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-full font-bold flex-shrink-0">
                 1
               </div>
               <div>
-                <h3 className="font-bold">Get Bot Token</h3>
-                <p className="text-slate-300">
+                <h3 className="font-bold text-gray-800">Get Bot Token</h3>
+                <p className="text-gray-600">
                   Search "BotFather" on Telegram, type
-                  <code className="bg-slate-800 px-2 py-1 rounded ml-2">
+                  <code
+                    className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700 ml-2`}
+                  >
                     /newbot
                   </code>
                 </p>
@@ -120,33 +135,41 @@ export default function Home() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full font-bold flex-shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-full font-bold flex-shrink-0">
                 2
               </div>
               <div>
-                <h3 className="font-bold">Set Environment Variable</h3>
-                <p className="text-slate-300">
-                  Add to{' '}
-                  <code className="bg-slate-800 px-2 py-1 rounded">
+                <h3 className="font-bold text-gray-800">
+                  Set Environment Variable
+                </h3>
+                <p className="text-gray-600">
+                  Add to{" "}
+                  <code
+                    className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+                  >
                     .env.local
                   </code>
                   :
                 </p>
-                <code className="block bg-slate-800 px-3 py-2 rounded mt-2 text-sm overflow-x-auto">
+                <code
+                  className={`${geistMono.className} block bg-gray-100 px-3 py-2 rounded mt-2 text-sm text-gray-700 overflow-x-auto`}
+                >
                   TELEGRAM_BOT_TOKEN=your_token_here
                 </code>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full font-bold flex-shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-full font-bold flex-shrink-0">
                 3
               </div>
               <div>
-                <h3 className="font-bold">Run Locally</h3>
-                <p className="text-slate-300">
+                <h3 className="font-bold text-gray-800">Run Locally</h3>
+                <p className="text-gray-600">
                   Execute
-                  <code className="bg-slate-800 px-2 py-1 rounded mx-2">
+                  <code
+                    className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700 mx-2`}
+                  >
                     npm run dev
                   </code>
                 </p>
@@ -154,12 +177,12 @@ export default function Home() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full font-bold flex-shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-full font-bold flex-shrink-0">
                 4
               </div>
               <div>
-                <h3 className="font-bold">Test Your Bot</h3>
-                <p className="text-slate-300">
+                <h3 className="font-bold text-gray-800">Test Your Bot</h3>
+                <p className="text-gray-600">
                   Search your bot on Telegram and click Start!
                 </p>
               </div>
@@ -169,28 +192,28 @@ export default function Home() {
 
         {/* Setup Guides */}
         <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">Setup Guides</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Setup Guides
+          </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <a
               href="/QUICK_START.md"
               download
-              className="bg-blue-600 hover:bg-blue-700 rounded-lg p-6 text-center transition"
+              className="bg-blue-50 hover:bg-blue-100 rounded-lg p-6 text-center transition border border-blue-200"
             >
               <div className="text-3xl mb-2">⚡</div>
-              <h3 className="font-bold">Quick Start</h3>
-              <p className="text-sm text-blue-100 mt-2">
-                5-minute setup guide
-              </p>
+              <h3 className="font-bold text-gray-800">Quick Start</h3>
+              <p className="text-sm text-gray-600 mt-2">5-minute setup guide</p>
             </a>
 
             <a
               href="/TELEGRAM_BOT_SETUP.md"
               download
-              className="bg-green-600 hover:bg-green-700 rounded-lg p-6 text-center transition"
+              className="bg-green-50 hover:bg-green-100 rounded-lg p-6 text-center transition border border-green-200"
             >
               <div className="text-3xl mb-2">📚</div>
-              <h3 className="font-bold">Full Guide</h3>
-              <p className="text-sm text-green-100 mt-2">
+              <h3 className="font-bold text-gray-800">Full Guide</h3>
+              <p className="text-sm text-gray-600 mt-2">
                 Complete setup & deployment
               </p>
             </a>
@@ -198,11 +221,11 @@ export default function Home() {
             <a
               href="/CRON_SETUP.md"
               download
-              className="bg-purple-600 hover:bg-purple-700 rounded-lg p-6 text-center transition"
+              className="bg-purple-50 hover:bg-purple-100 rounded-lg p-6 text-center transition border border-purple-200"
             >
               <div className="text-3xl mb-2">🕐</div>
-              <h3 className="font-bold">Cron Setup</h3>
-              <p className="text-sm text-purple-100 mt-2">
+              <h3 className="font-bold text-gray-800">Cron Setup</h3>
+              <p className="text-sm text-gray-600 mt-2">
                 Daily 7 AM reminders config
               </p>
             </a>
@@ -211,29 +234,45 @@ export default function Home() {
 
         {/* Environment Setup */}
         <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">Environment Setup</h2>
-          <div className="bg-slate-700 rounded-lg p-8">
-            <p className="text-slate-300 mb-4">
-              Create a <code className="bg-slate-800 px-2 py-1 rounded">.env.local</code> file:
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Environment Setup
+          </h2>
+          <div className="bg-white rounded-lg p-8 shadow-sm">
+            <p className="text-gray-600 mb-4">
+              Create a{" "}
+              <code
+                className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+              >
+                .env.local
+              </code>{" "}
+              file:
             </p>
-            <div className="bg-slate-800 rounded p-4 overflow-x-auto">
-              <pre className="text-sm">
-{`TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
+            <div className="bg-gray-100 rounded p-4 overflow-x-auto">
+              <pre className={`${geistMono.className} text-sm text-gray-700`}>
+                {`TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
 CRON_SECRET=your-secret-key-change-this
 `}
               </pre>
             </div>
-            <p className="text-slate-400 text-sm mt-4">
-              See <code className="bg-slate-800 px-2 py-1 rounded">.env.example</code> for reference
+            <p className="text-gray-500 text-sm mt-4">
+              See{" "}
+              <code
+                className={`${geistMono.className} bg-gray-100 px-2 py-1 rounded text-gray-700`}
+              >
+                .env.example
+              </code>{" "}
+              for reference
             </p>
           </div>
         </section>
 
         {/* File Structure */}
         <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">Project Structure</h2>
-          <div className="bg-slate-700 rounded-lg p-6 font-mono text-sm overflow-x-auto">
-            <pre>{`lib/
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Project Structure
+          </h2>
+          <div className="bg-white rounded-lg p-6 font-mono text-sm overflow-x-auto shadow-sm">
+            <pre className={`${geistMono.className} text-gray-700`}>{`lib/
 ├── telegram-bot.ts    # Telegram API wrapper
 ├── schedule.ts        # Schedule logic & storage
 └── handlers.ts        # Message & button handlers
@@ -247,9 +286,11 @@ app/
         </section>
 
         {/* Next Steps */}
-        <section className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to Start? 🚀</h2>
-          <p className="mb-6 text-slate-100">
+        <section className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8 text-center border border-blue-200">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Ready to Start? 🚀
+          </h2>
+          <p className="mb-6 text-gray-600">
             Follow the Quick Start guide to get your bot running in 5 minutes
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
@@ -257,18 +298,18 @@ app/
               href="https://t.me/BotFather"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white text-purple-600 px-6 py-2 rounded font-bold hover:bg-slate-100 transition"
+              className="bg-gray-800 text-white px-6 py-2 rounded font-bold hover:bg-gray-700 transition"
             >
               Message BotFather →
             </a>
             <button
               onClick={() => {
-                const el = document.createElement('a');
-                el.href = '/QUICK_START.md';
-                el.download = 'QUICK_START.md';
+                const el = document.createElement("a");
+                el.href = "/QUICK_START.md";
+                el.download = "QUICK_START.md";
                 el.click();
               }}
-              className="bg-slate-800 text-white px-6 py-2 rounded font-bold hover:bg-slate-700 transition"
+              className="bg-gray-200 text-gray-800 px-6 py-2 rounded font-bold hover:bg-gray-300 transition"
             >
               Download Guide
             </button>
@@ -276,7 +317,7 @@ app/
         </section>
 
         {/* Footer */}
-        <footer className="mt-12 text-center text-slate-400 text-sm">
+        <footer className="mt-12 text-center text-gray-500 text-sm">
           <p>Telegram Study Schedule Bot • Made with Next.js</p>
           <p className="mt-2">
             For detailed instructions, check TELEGRAM_BOT_SETUP.md
