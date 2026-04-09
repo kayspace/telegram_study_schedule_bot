@@ -51,7 +51,8 @@ export function initializeSlotCountSetup(userId: number): void {
     userSelections[userId] = { timestamp: Date.now() };
   }
   userSelections[userId].phase = "slot-count-setup";
-  userSelections[userId].slotCount = 4; // Default to 4 slots
+  const lastSlotCount = getLastSlotCount(userId);
+  userSelections[userId].slotCount = lastSlotCount || 4; // Use last count if available
 }
 
 /**
@@ -121,6 +122,7 @@ export function getLastUserTimes(userId: number): string[] | null {
 export function usePreviousTimes(userId: number): boolean {
   const lastTimes = getLastUserTimes(userId);
   const lastSlotCount = getLastSlotCount(userId);
+  const lastWakeUpTime = getLastWakeUpTime(userId);
   if (!lastTimes || !lastSlotCount || lastTimes.length !== lastSlotCount) {
     return false;
   }
@@ -128,6 +130,9 @@ export function usePreviousTimes(userId: number): boolean {
     userSelections[userId] = { timestamp: Date.now() };
   }
   userSelections[userId].customTimes = [...lastTimes];
+  if (lastWakeUpTime) {
+    userSelections[userId].wakeUpTime = lastWakeUpTime;
+  }
   userSelections[userId].phase = "subject-setup";
   return true;
 }
