@@ -383,6 +383,40 @@ export function generateTimetableMessage(userId: number): string {
 }
 
 /**
+ * Generate copyable schedule text (plain text without Telegram formatting)
+ */
+export function generateCopyableSchedule(userId: number): string {
+  const schedule = getUserSchedule(userId);
+  const customTimes = getUserCustomTimes(userId);
+  const slotCount = getSlotCount(userId);
+
+  // Get current date in dd-mm-yyyy format
+  const today = new Date();
+  const dateStr = `${today.getDate().toString().padStart(2, "0")}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${today.getFullYear()}`;
+
+  // Get wake up time from user input
+  const wakeUpTime = getWakeUpTime(userId) || "7:00 am";
+
+  let message = "Schedule\n\n";
+  message += `${dateStr}\n`;
+  message += `Wake up : ${wakeUpTime}\n\n`;
+
+  for (let i = 0; i < slotCount; i++) {
+    const slotName = `SLOT ${i + 1}`;
+    const time = customTimes[i] || "Not set";
+    const selected = schedule[`Slot ${i + 1}`];
+    const subject = selected || "Not Selected";
+
+    message += `${slotName}\n`;
+    message += `${subject}: ${time}\n\n`;
+  }
+
+  message += "****************************";
+
+  return message;
+}
+
+/**
  * Get all users' latest selections
  */
 export function getAllUserSelections() {
