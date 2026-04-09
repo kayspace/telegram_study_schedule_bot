@@ -220,7 +220,12 @@ export function isScheduleComplete(userId: number): boolean {
  * Reset user selections
  */
 export function resetUserSchedule(userId: number) {
+  const lastTimes = userSelections[userId]?.lastTimes;
   delete userSelections[userId];
+  // Preserve last used times for reuse
+  if (lastTimes) {
+    userSelections[userId] = { timestamp: Date.now(), lastTimes };
+  }
 }
 
 /**
