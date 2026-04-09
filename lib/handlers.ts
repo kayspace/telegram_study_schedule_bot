@@ -14,7 +14,6 @@ import {
   selectSubject,
   isScheduleComplete,
   generateTimetableMessage,
-  generateCopyableSchedule,
   resetUserSchedule,
   getUserSchedule,
   initializeSlotCountSetup,
@@ -238,15 +237,6 @@ async function handleCallbackQuery(
     return;
   }
 
-  if (data === "copy_schedule") {
-    const copyableSchedule = generateCopyableSchedule(userId);
-    await bot.sendMessage(
-      chatId,
-      `<code>${copyableSchedule}</code>\n\n<i>Copy the text above to use your schedule elsewhere!</i>`,
-    );
-    return;
-  }
-
   // Handle subject selection: "slot_Subject Name"
   if (data.startsWith("slot_")) {
     const subject = data.substring(5);
@@ -267,10 +257,7 @@ async function handleCallbackQuery(
     // Check if all slots are filled
     if (isScheduleComplete(userId)) {
       const timetable = generateTimetableMessage(userId);
-      const copyButton = [
-        [{ text: "📋 Copy Schedule", callback_data: "copy_schedule" }],
-      ];
-      await bot.editMessageText(chatId, messageId, timetable, copyButton);
+      await bot.editMessageText(chatId, messageId, timetable);
       return;
     }
 
@@ -291,13 +278,10 @@ export async function sendSchedulePrompt(
 
   if (!currentSlot) {
     const timetable = generateTimetableMessage(chatId);
-    const copyButton = [
-      [{ text: "📋 Copy Schedule", callback_data: "copy_schedule" }],
-    ];
     if (messageId) {
-      await bot.editMessageText(chatId, messageId, timetable, copyButton);
+      await bot.editMessageText(chatId, messageId, timetable);
     } else {
-      await bot.sendMessageWithButtons(chatId, timetable, copyButton);
+      await bot.sendMessage(chatId, timetable);
     }
     return;
   }
