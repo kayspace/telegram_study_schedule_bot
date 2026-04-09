@@ -15,32 +15,20 @@ const SUBJECTS = [
   "Fluid Mechanics",
 ];
 
-const SLOTS = [
-  { name: "Slot 1", time: "8:30 AM - 11:00 AM" },
-  { name: "Slot 2", time: "12:10 PM - 2:00 PM" },
-  { name: "Slot 3", time: "2:40 PM - 5:40 PM" },
-  { name: "Slot 4", time: "7:30 PM - 10:00 PM" },
-];
-
 // In-memory storage for user selections (in production, use a database)
 const userSelections: Record<
   number,
   {
-    [key: string]: string;
+    [key: string]: any;
     timestamp: number;
     lastTimes?: string[];
+    lastSlotCount?: number;
     customTimes?: string[];
-    phase?: "time-setup" | "subject-setup";
+    phase?: "time-setup" | "slot-count-setup" | "subject-setup";
     timeSlotIndex?: number;
+    slotCount?: number;
   }
 > = {};
-
-export interface UserSchedule {
-  "Slot 1": string | null;
-  "Slot 2": string | null;
-  "Slot 3": string | null;
-  "Slot 4": string | null;
-}
 
 /**
  * Get available subjects
@@ -50,19 +38,65 @@ export function getSubjects(): string[] {
 }
 
 /**
- * Get available time slots
+ * Initialize user for slot count setup
  */
-export function getSlots() {
-  return SLOTS;
-}
-
-/**
- * Initialize user for time slot setup
- */
-export function initializeTimeSlotSetup(userId: number): void {
+export function initializeSlotCountSetup(userId: number): void {
   if (!userSelections[userId]) {
     userSelections[userId] = { timestamp: Date.now() };
   }
+  userSelections[userId].phase = "slot-count-setup";
+  userSelections[userId].slotCount = 4; // Default to 4 slots
+}
+
+/**
+ * Get user's last slot count
+ */
+export function getLastSlotCount(userId: number): number | null {
+  return userSelections[userId]?.lastSlotCount || null;
+}
+
+/**
+ * Set slot count for user
+ */
+export function setSlotCount(userId: number, count: number): void {
+  if (!userSelections[userId]) {
+    userSelections[userId] = { timestamp: Date.now() };
+  }
+  userSelections[userId].slotCount = Math.max(1, Math.min(10, count)); // Limit between 1-10
+}
+
+/**
+ * Get current slot count for user
+ */
+export function getSlotCount(userId: number): number {
+  return userSelections[userId]?.slotCount || 4;
+}
+
+/**
+ * Add a slot
+ */
+export function addSlot(userId: number): void {
+  const currentCount = getSlotCount(userId);
+  setSlotCount(userId, currentCount + 1);
+}
+
+/**
+ * Remove a slot
+ */
+export function removeSlot(userId: number): void {
+  const currentCount = getSlotCount(userId);
+  setSlotCount(userId, currentCount - 1);
+}
+
+/**
+ * Confirm slot count and move to time setup
+ */
+export function confirmSlotCount(userId: number): void {
+  const slotCount = getSlotCount(userId);
+  if (!userSelections[userId]) {
+    userSelections[userId] = { timestamp: Date.now() };
+  }
+  userSelections[userId].lastSlotCount = slotCount;
   userSelections[userId].phase = "time-setup";
   userSelections[userId].customTimes = [];
   userSelections[userId].timeSlotIndex = 0;
@@ -80,7 +114,8 @@ export function getLastUserTimes(userId: number): string[] | null {
  */
 export function usePreviousTimes(userId: number): boolean {
   const lastTimes = getLastUserTimes(userId);
-  if (!lastTimes || lastTimes.length !== 4) {
+  const lastSlotCount = getLastSlotCount(userId);
+  if (!lastTimes || !lastSlotCount || lastTimes.length !== lastSlotCount) {
     return false;
   }
   if (!userSelections[userId]) {
@@ -116,7 +151,8 @@ export function addCustomTime(userId: number, time: string): boolean {
  * Check if time setup is complete
  */
 export function isTimeSetupComplete(userId: number): boolean {
-  return (userSelections[userId]?.customTimes?.length || 0) === 4;
+  const slotCount = getSlotCount(userId);
+  return (userSelections[userId]?.customTimes?.length || 0) === slotCount;
 }
 
 /**
@@ -129,6 +165,7 @@ export function startSubjectSelection(userId: number): void {
   if (userSelections[userId].customTimes) {
     userSelections[userId].lastTimes = [...userSelections[userId].customTimes!];
   }
+  userSelections[userId].lastSlotCount = getSlotCount(userId);
   userSelections[userId].phase = "subject-setup";
 }
 
@@ -137,7 +174,7 @@ export function startSubjectSelection(userId: number): void {
  */
 export function getUserPhase(
   userId: number,
-): "time-setup" | "subject-setup" | null {
+): "time-setup" | "slot-count-setup" | "subject-setup" | null {
   return userSelections[userId]?.phase || null;
 }
 
@@ -166,8 +203,10 @@ export function getCurrentSlot(userId: number): string | null {
     return null;
   }
 
+  const slotCount = getSlotCount(userId);
+
   // Check which slot needs a subject
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= slotCount; i++) {
     const slotName = `Slot ${i}`;
     if (!data[slotName]) {
       return slotName;
@@ -180,15 +219,17 @@ export function getCurrentSlot(userId: number): string | null {
 /**
  * Get all selected subjects for a user
  */
-export function getUserSchedule(userId: number): UserSchedule {
+export function getUserSchedule(userId: number): Record<string, string | null> {
   const data = userSelections[userId] || {};
+  const slotCount = getSlotCount(userId);
+  const schedule: Record<string, string | null> = {};
 
-  return {
-    "Slot 1": data["Slot 1"] || null,
-    "Slot 2": data["Slot 2"] || null,
-    "Slot 3": data["Slot 3"] || null,
-    "Slot 4": data["Slot 4"] || null,
-  };
+  for (let i = 1; i <= slotCount; i++) {
+    const slotName = `Slot ${i}`;
+    schedule[slotName] = data[slotName] || null;
+  }
+
+  return schedule;
 }
 
 /**
@@ -208,12 +249,16 @@ export function selectSubject(userId: number, slot: string, subject: string) {
  */
 export function isScheduleComplete(userId: number): boolean {
   const schedule = getUserSchedule(userId);
-  return (
-    schedule["Slot 1"] !== null &&
-    schedule["Slot 2"] !== null &&
-    schedule["Slot 3"] !== null &&
-    schedule["Slot 4"] !== null
-  );
+  const slotCount = getSlotCount(userId);
+
+  for (let i = 1; i <= slotCount; i++) {
+    const slotName = `Slot ${i}`;
+    if (schedule[slotName] === null) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -221,10 +266,15 @@ export function isScheduleComplete(userId: number): boolean {
  */
 export function resetUserSchedule(userId: number) {
   const lastTimes = userSelections[userId]?.lastTimes;
+  const lastSlotCount = userSelections[userId]?.lastSlotCount;
   delete userSelections[userId];
-  // Preserve last used times for reuse
-  if (lastTimes) {
-    userSelections[userId] = { timestamp: Date.now(), lastTimes };
+  // Preserve last used times and slot count for reuse
+  if (lastTimes || lastSlotCount) {
+    userSelections[userId] = {
+      timestamp: Date.now(),
+      lastTimes,
+      lastSlotCount,
+    };
   }
 }
 
@@ -234,20 +284,21 @@ export function resetUserSchedule(userId: number) {
 export function generateTimetableMessage(userId: number): string {
   const schedule = getUserSchedule(userId);
   const customTimes = getUserCustomTimes(userId);
+  const slotCount = getSlotCount(userId);
 
   let message = "<b>📅 Your Study Timetable</b>\n\n";
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < slotCount; i++) {
     const slotName = `Slot ${i + 1}`;
     const time = customTimes[i] || "Not set";
-    const selected = schedule[slotName as keyof UserSchedule];
+    const selected = schedule[slotName];
     const subject = selected || "❌ Not Selected";
 
     message += `<b>${slotName}</b> (${time})\n`;
     message += `📚 ${subject}\n\n`;
   }
 
-  message += "<i>***************************</i>";
+  message += "<i>Schedule generated successfully!</i>";
 
   return message;
 }

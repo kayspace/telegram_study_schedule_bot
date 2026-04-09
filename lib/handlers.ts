@@ -10,14 +10,19 @@ import TelegramBot, {
 } from "./telegram-bot";
 import {
   getSubjects,
-  getSlots,
   getCurrentSlot,
   selectSubject,
   isScheduleComplete,
   generateTimetableMessage,
   resetUserSchedule,
   getUserSchedule,
-  initializeTimeSlotSetup,
+  initializeSlotCountSetup,
+  getLastSlotCount,
+  setSlotCount,
+  getSlotCount,
+  addSlot,
+  removeSlot,
+  confirmSlotCount,
   getLastUserTimes,
   usePreviousTimes,
   addCustomTime,
@@ -60,13 +65,33 @@ async function handleMessage(
   // /start command - begin scheduling
   if (text === "/start" || text === "start") {
     resetUserSchedule(chatId);
-    initializeTimeSlotSetup(chatId);
-    await offerTimeSlotOptions(chatId, bot);
+    initializeSlotCountSetup(chatId);
+    await offerSlotCountOptions(chatId, bot);
     return;
   }
 
-  // Check if user is setting up times
+  // Check if user is setting up slot count
   const phase = getUserPhase(chatId);
+  if (phase === "slot-count-setup") {
+    // Handle slot count adjustments via text commands
+    if (text === "+" || text.toLowerCase() === "add") {
+      addSlot(chatId);
+      await offerSlotCountOptions(chatId, bot);
+      return;
+    }
+    if (text === "-" || text.toLowerCase() === "remove") {
+      removeSlot(chatId);
+      await offerSlotCountOptions(chatId, bot);
+      return;
+    }
+    if (text === "done" || text.toLowerCase() === "continue") {
+      confirmSlotCount(chatId);
+      await offerTimeSlotOptions(chatId, bot);
+      return;
+    }
+  }
+
+  // Check if user is setting up times
   if (phase === "time-setup") {
     await handleTimeInput(chatId, message.text || "", bot);
     return;
@@ -99,6 +124,23 @@ async function handleCallbackQuery(
 
   // Answer the callback to remove loading state
   await bot.answerCallbackQuery(query.id);
+
+  // Handle slot count setup
+  if (data === "add_slot") {
+    addSlot(userId);
+    await offerSlotCountOptions(chatId, bot, messageId);
+    return;
+  }
+  if (data === "remove_slot") {
+    removeSlot(userId);
+    await offerSlotCountOptions(chatId, bot, messageId);
+    return;
+  }
+  if (data === "confirm_slots") {
+    confirmSlotCount(userId);
+    await offerTimeSlotOptions(chatId, bot);
+    return;
+  }
 
   // Handle "use previous times" button
   if (data === "use_previous") {
@@ -193,10 +235,11 @@ export async function sendSchedulePrompt(
   }
 
   const progressText = Object.values(schedule).filter((s) => s !== null).length;
+  const totalSlots = getSlotCount(chatId);
 
   let message = `<b>📚 Select Subject for ${currentSlot}</b>\n`;
   message += `<i>${time}</i>\n\n`;
-  message += `Progress: ${progressText}/4 slots completed\n\n`;
+  message += `Progress: ${progressText}/${totalSlots} slots completed\n\n`;
   message += "Choose a subject:";
 
   if (messageId) {
@@ -237,11 +280,12 @@ async function offerTimeSlotOptions(
   messageId?: number,
 ): Promise<void> {
   const lastTimes = getLastUserTimes(chatId);
+  const lastSlotCount = getLastSlotCount(chatId);
 
   let message = "<b>⏰ Set Your Study Time Slots</b>\n\n";
 
-  if (lastTimes && lastTimes.length === 4) {
-    message += "Your last used times:\n";
+  if (lastTimes && lastSlotCount && lastTimes.length === lastSlotCount) {
+    message += `Your last setup (${lastSlotCount} slots):\n`;
     lastTimes.forEach((time, i) => {
       message += `Slot ${i + 1}: ${time}\n`;
     });
@@ -280,10 +324,11 @@ async function sendTimePrompt(
   messageId?: number,
 ): Promise<void> {
   const slotIndex = getCurrentTimeSlotIndex(chatId);
+  const totalSlots = getSlotCount(chatId);
   const message =
     `<b>⏰ Enter Slot ${slotIndex + 1} Time Range</b>\n\n` +
     "Format: HH:MM - HH:MM (e.g., 8:15 - 11:00)\n\n" +
-    `Progress: ${slotIndex}/4 slots`;
+    `Progress: ${slotIndex}/${totalSlots} slots`;
 
   if (messageId) {
     await bot.editMessageText(chatId, messageId, message);
@@ -322,5 +367,43 @@ async function handleTimeInput(
     await sendSchedulePrompt(chatId, bot);
   } else {
     await sendTimePrompt(chatId, bot);
+  }
+}
+
+/**
+ * Offer slot count setup options
+ */
+async function offerSlotCountOptions(
+  chatId: number,
+  bot: TelegramBot,
+  messageId?: number,
+): Promise<void> {
+  const lastSlotCount = getLastSlotCount(chatId);
+  const currentSlotCount = getSlotCount(chatId);
+
+  let message = "<b>⏰ Set Number of Study Slots</b>\n\n";
+
+  if (lastSlotCount && lastSlotCount !== currentSlotCount) {
+    message += `Your last setup had ${lastSlotCount} slots.\n\n`;
+  }
+
+  message += `Current slots: <b>${currentSlotCount}</b>\n\n`;
+  message += "Use buttons to adjust or send:\n";
+  message += "<code>+</code> or <code>add</code> - Add slot\n";
+  message += "<code>-</code> or <code>remove</code> - Remove slot\n";
+  message += "<code>done</code> or <code>continue</code> - Continue";
+
+  const buttons = [
+    [
+      { text: "➕ Add Slot", callback_data: "add_slot" },
+      { text: "➖ Remove Slot", callback_data: "remove_slot" },
+    ],
+    [{ text: "✅ Continue", callback_data: "confirm_slots" }],
+  ];
+
+  if (messageId) {
+    await bot.editMessageText(chatId, messageId, message, buttons);
+  } else {
+    await bot.sendMessageWithButtons(chatId, message, buttons);
   }
 }

@@ -69,6 +69,8 @@ Your Bot (Next.js)
 5. Flight Mechanics
 6. Mathematics
 7. Aptitude
+8. Gas Dynamics
+9. Fluid Mechanics
 
 ## 🔧 Environment Variables
 
@@ -190,10 +192,6 @@ Replace `userSelections` object in `lib/schedule.ts` with database queries.
 ## 📄 License
 
 Free to use and modify.
-
-## 🎉 That's It!
-
-Your bot is ready. Start with **QUICK_START.md** for next steps!
 
 ---
 
