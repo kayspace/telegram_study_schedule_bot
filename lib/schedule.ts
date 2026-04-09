@@ -24,9 +24,15 @@ const userSelections: Record<
     lastTimes?: string[];
     lastSlotCount?: number;
     customTimes?: string[];
-    phase?: "time-setup" | "slot-count-setup" | "subject-setup";
+    phase?:
+      | "time-setup"
+      | "slot-count-setup"
+      | "wake-up-setup"
+      | "subject-setup";
     timeSlotIndex?: number;
     slotCount?: number;
+    wakeUpTime?: string;
+    lastWakeUpTime?: string;
   }
 > = {};
 
@@ -156,6 +162,46 @@ export function isTimeSetupComplete(userId: number): boolean {
 }
 
 /**
+ * Move to wake up time setup
+ */
+export function startWakeUpTimeSetup(userId: number): void {
+  if (!userSelections[userId]) {
+    userSelections[userId] = { timestamp: Date.now() };
+  }
+  userSelections[userId].phase = "wake-up-setup";
+}
+
+/**
+ * Set wake up time for user
+ */
+export function setWakeUpTime(userId: number, time: string): boolean {
+  // Validate time format (simple validation for now)
+  if (!time.trim()) return false;
+
+  if (!userSelections[userId]) {
+    userSelections[userId] = { timestamp: Date.now() };
+  }
+  userSelections[userId].wakeUpTime = time.trim();
+  userSelections[userId].lastWakeUpTime = time.trim();
+  userSelections[userId].phase = "subject-setup";
+  return true;
+}
+
+/**
+ * Get user's wake up time
+ */
+export function getWakeUpTime(userId: number): string | null {
+  return userSelections[userId]?.wakeUpTime || null;
+}
+
+/**
+ * Get user's last wake up time
+ */
+export function getLastWakeUpTime(userId: number): string | null {
+  return userSelections[userId]?.lastWakeUpTime || null;
+}
+
+/**
  * Move to subject selection
  */
 export function startSubjectSelection(userId: number): void {
@@ -174,7 +220,12 @@ export function startSubjectSelection(userId: number): void {
  */
 export function getUserPhase(
   userId: number,
-): "time-setup" | "slot-count-setup" | "subject-setup" | null {
+):
+  | "time-setup"
+  | "slot-count-setup"
+  | "wake-up-setup"
+  | "subject-setup"
+  | null {
   return userSelections[userId]?.phase || null;
 }
 
@@ -267,13 +318,15 @@ export function isScheduleComplete(userId: number): boolean {
 export function resetUserSchedule(userId: number) {
   const lastTimes = userSelections[userId]?.lastTimes;
   const lastSlotCount = userSelections[userId]?.lastSlotCount;
+  const lastWakeUpTime = userSelections[userId]?.lastWakeUpTime;
   delete userSelections[userId];
-  // Preserve last used times and slot count for reuse
-  if (lastTimes || lastSlotCount) {
+  // Preserve last used times, slot count, and wake up time for reuse
+  if (lastTimes || lastSlotCount || lastWakeUpTime) {
     userSelections[userId] = {
       timestamp: Date.now(),
       lastTimes,
       lastSlotCount,
+      lastWakeUpTime,
     };
   }
 }
@@ -286,19 +339,28 @@ export function generateTimetableMessage(userId: number): string {
   const customTimes = getUserCustomTimes(userId);
   const slotCount = getSlotCount(userId);
 
-  let message = "<b>📅 Your Study Timetable</b>\n\n";
+  // Get current date in dd-mm-yyyy format
+  const today = new Date();
+  const dateStr = `${today.getDate().toString().padStart(2, "0")}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${today.getFullYear()}`;
+
+  // Get wake up time from user input
+  const wakeUpTime = getWakeUpTime(userId) || "7:00 am";
+
+  let message = "*Schedule*\n\n";
+  message += `*${dateStr}*\n`;
+  message += `Wake up : ${wakeUpTime}\n\n`;
 
   for (let i = 0; i < slotCount; i++) {
-    const slotName = `Slot ${i + 1}`;
+    const slotName = `SLOT ${i + 1}`;
     const time = customTimes[i] || "Not set";
-    const selected = schedule[slotName];
-    const subject = selected || "❌ Not Selected";
+    const selected = schedule[`Slot ${i + 1}`];
+    const subject = selected || "Not Selected";
 
-    message += `<b>${slotName}</b> (${time})\n`;
-    message += `📚 ${subject}\n\n`;
+    message += `➡${slotName}\n`;
+    message += `${subject}: ${time}\n\n`;
   }
 
-  message += "<i>Schedule generated successfully!</i>";
+  message += "****************************";
 
   return message;
 }

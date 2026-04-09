@@ -27,6 +27,9 @@ import {
   usePreviousTimes,
   addCustomTime,
   isTimeSetupComplete,
+  startWakeUpTimeSetup,
+  setWakeUpTime,
+  getWakeUpTime,
   startSubjectSelection,
   getUserPhase,
   getCurrentTimeSlotIndex,
@@ -94,6 +97,12 @@ async function handleMessage(
   // Check if user is setting up times
   if (phase === "time-setup") {
     await handleTimeInput(chatId, message.text || "", bot);
+    return;
+  }
+
+  // Check if user is setting up wake up time
+  if (phase === "wake-up-setup") {
+    await handleWakeUpTimeInput(chatId, message.text || "", bot);
     return;
   }
 
@@ -355,19 +364,43 @@ async function handleTimeInput(
   }
 
   if (isTimeSetupComplete(chatId)) {
-    startSubjectSelection(chatId);
+    startWakeUpTimeSetup(chatId);
     const customTimes = getUserCustomTimes(chatId);
     let confirmMessage = "<b>✅ Your time slots are set!</b>\n\n";
     customTimes.forEach((time, i) => {
       confirmMessage += `Slot ${i + 1}: ${time}\n`;
     });
-    confirmMessage += "\nNow select subjects for each slot:";
+    confirmMessage +=
+      "\n\n⏰ Now please tell me your wake up time (e.g., 7:15 am):";
 
     await bot.sendMessage(chatId, confirmMessage);
-    await sendSchedulePrompt(chatId, bot);
   } else {
     await sendTimePrompt(chatId, bot);
   }
+}
+
+/**
+ * Handle wake up time input from user
+ */
+async function handleWakeUpTimeInput(
+  chatId: number,
+  input: string,
+  bot: TelegramBot,
+): Promise<void> {
+  if (!setWakeUpTime(chatId, input)) {
+    await bot.sendMessage(
+      chatId,
+      "❌ Please provide a valid wake up time (e.g., 7:15 am, 6:30 pm)",
+    );
+    return;
+  }
+
+  const wakeUpTime = getWakeUpTime(chatId);
+  await bot.sendMessage(
+    chatId,
+    `✅ Wake up time set to: ${wakeUpTime}\n\nNow select subjects for each slot:`,
+  );
+  await sendSchedulePrompt(chatId, bot);
 }
 
 /**
