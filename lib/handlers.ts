@@ -70,7 +70,17 @@ async function handleMessage(
   if (text === "/start" || text === "start") {
     resetUserSchedule(chatId);
     initializeSlotCountSetup(chatId);
-    await offerSlotCountOptions(chatId, bot);
+
+    // Check if user has previous complete setup to offer reuse
+    const lastTimes = getLastUserTimes(chatId);
+    const lastSlotCount = getLastSlotCount(chatId);
+    if (lastTimes && lastSlotCount && lastTimes.length === lastSlotCount) {
+      // User has complete previous setup, offer to reuse everything
+      await offerCompleteReuseOptions(chatId, bot);
+    } else {
+      // No complete setup, start with slot count
+      await offerSlotCountOptions(chatId, bot);
+    }
     return;
   }
 
@@ -200,6 +210,30 @@ async function handleCallbackQuery(
 
   if (data === "set_new_wakeup") {
     await offerWakeUpTimeOptions(chatId, bot, messageId);
+    return;
+  }
+
+  if (data === "reuse_complete") {
+    if (usePreviousTimes(userId)) {
+      await bot.editMessageText(
+        chatId,
+        messageId,
+        "<b>✅ Using your complete previous setup!</b>\n\nNow select subjects for each slot.",
+      );
+      await sendSchedulePrompt(chatId, bot);
+    } else {
+      await bot.editMessageText(
+        chatId,
+        messageId,
+        "❌ Could not reuse previous setup. Starting fresh.",
+      );
+      await offerSlotCountOptions(chatId, bot, messageId);
+    }
+    return;
+  }
+
+  if (data === "setup_fresh") {
+    await offerSlotCountOptions(chatId, bot, messageId);
     return;
   }
 
@@ -347,6 +381,48 @@ async function offerTimeSlotOptions(
     } else {
       await bot.sendMessage(chatId, message);
     }
+  }
+}
+
+/**
+ * Offer complete reuse options at start
+ */
+async function offerCompleteReuseOptions(
+  chatId: number,
+  bot: TelegramBot,
+  messageId?: number,
+): Promise<void> {
+  const lastTimes = getLastUserTimes(chatId);
+  const lastSlotCount = getLastSlotCount(chatId);
+  const lastWakeUpTime = getLastWakeUpTime(chatId);
+
+  let message = "<b>📅 Welcome back!</b>\n\n";
+  message += "I found your previous study setup:\n\n";
+  message += `📊 ${lastSlotCount} study slots\n`;
+
+  if (lastTimes) {
+    lastTimes.forEach((time, i) => {
+      message += `⏰ Slot ${i + 1}: ${time}\n`;
+    });
+  }
+
+  if (lastWakeUpTime) {
+    message += `🌅 Wake up: ${lastWakeUpTime}\n`;
+  }
+
+  message += "\nWould you like to use this setup again or create a new one?";
+
+  const buttons = [
+    [
+      { text: "✅ Use Previous Setup", callback_data: "reuse_complete" },
+      { text: "🆕 Create New", callback_data: "setup_fresh" },
+    ],
+  ];
+
+  if (messageId) {
+    await bot.editMessageText(chatId, messageId, message, buttons);
+  } else {
+    await bot.sendMessageWithButtons(chatId, message, buttons);
   }
 }
 

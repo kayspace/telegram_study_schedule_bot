@@ -340,6 +340,18 @@ export function resetUserSchedule(userId: number) {
  * Generate formatted timetable message
  */
 export function generateTimetableMessage(userId: number): string {
+  // Save current session values as "last" for future reuse
+  const data = userSelections[userId];
+  if (data) {
+    if (data.customTimes) {
+      data.lastTimes = [...data.customTimes];
+    }
+    data.lastSlotCount = getSlotCount(userId);
+    if (data.wakeUpTime) {
+      data.lastWakeUpTime = data.wakeUpTime;
+    }
+  }
+
   const schedule = getUserSchedule(userId);
   const customTimes = getUserCustomTimes(userId);
   const slotCount = getSlotCount(userId);
